@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stick Arc</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.ico.png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- 🔴 RED STICK ARC SECTION (PAGE START) -->
+    <div class="top-image" id="stickarc">
+        <img src="logo.png.png" alt="Top Banner">
+    </div>
+
+    <!-- 🔘 TOP BUTTONS -->
+    <div class="buttons">
+        <a href="login.html" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="profile.png">
+                <img class="hover" src="profileg.png">
+                <span class="btn-label">Profile</span>
+            </div>
+        </a>
+
+        <a href="inbox.html" class="btn-link" id="inboxBtn">
+            <div class="btn">
+                <img class="idle" src="inbox.png">
+                <img class="hover" src="inboxg.png">
+                <span class="btn-label">Inbox</span>
+            </div>
+        </a>
+
+        <a href="user-search.html" class="btn-link" id="searchUserBtn">
+            <div class="btn">
+                <img class="idle" src="sprofile.png">
+                <img class="hover" src="sprofileg.png">
+                <span class="btn-label">Search User</span>
+            </div>
+        </a>
+
+        <a href="help.html" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="i.png">
+                <img class="hover" src="ig.png">
+            </div>
+        </a>
+
+        <a href="credits.html" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="c.png">
+                <img class="hover" src="cg.png">
+            </div>
+        </a>
+
+        <a href="terms.html" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="tac.png">
+                <img class="hover" src="tacg.png">
+            </div>
+        </a>
+
+        <a href="youtube.html" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="y.png">
+                <img class="hover" src="yg.png">
+            </div>
+        </a>
+
+        <a href="https://discord.gg/tAMnxW3Zx3" target="_blank" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="D.png">
+                <img class="hover" src="dg.png">
+            </div>
+        </a>
+
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScmFwYrh0o5l9MTWzADs5q-UDjPQSXXZA2ro-A9qbOACPVouw/viewform"
+            target="_blank" class="btn-link">
+            <div class="btn">
+                <img class="idle" src="f.png">
+                <img class="hover" src="fg.png">
+            </div>
+        </a>
+
+    </div>
+
+    <!-- 🔍 SEARCH BOX (JUST ABOVE REQUEST) -->
+    <div class="search-box" >
+        <input 
+            type="text"
+            id="searchInput"
+            placeholder="Search character..."
+            onkeyup="filterCharacters()"
+        >
+    </div>
+
+    <!-- 📨 REQUEST BUTTON -->
+    <div class="request-box" id="requestBox">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeyWUYdP-R9U8lZIP6-XqKtxMQgrnW8NkwdzADHRsB-BCYeow/viewform"
+            class="request-btn">
+            Won’t find your character? Request it here!
+        </a>
+    </div>
+
+    <!-- 🟢 CHARACTERS SECTION -->
+    <div class="characters-section">
+
+        <img src="bgp.png" class="bg-image" alt="Characters Background">
+
+        <div class="characters-grid">
+
+            <a href="lava-griffon.html" class="character">
+                <img class="idle" src="s10.png">
+                <img class="hover" src="s10p.png">
+                <span>Emberwing Grivor</span>
+            </a>
+
+            <a href="voltaic-griffon.html" class="character">
+                <img class="idle" src="s2.png">
+                <img class="hover" src="s2p.png">
+                <span>Thunder Grivor</span>
+            </a>
+
+            <a href="savage-giant.html" class="character">
+                <img class="idle" src="s3.png">
+                <img class="hover" src="s3p.png">
+                <span>Ravager Bront</span>
+            </a>
+
+            <a href="classis-spearton.html" class="character">
+                <img class="idle" src="s4.png">
+                <img class="hover" src="s4p.png">
+                <span>Spartok</span>
+            </a>
+
+            <a href="final-boss.html" class="character">
+                <img class="idle" src="s5.png">
+                <img class="hover" src="s5p.png">
+                <span>Overlord</span>
+            </a>
+
+            <a href="golden-warrior.html" class="character">
+                <img class="idle" src="s6.png">
+                <img class="hover" src="s6p.png">
+                <span>Golden Swordlash</span>
+            </a>
+
+            <a href="ice-grandpa.html" class="character">
+                <img class="idle" src="s7.png">
+                <img class="hover" src="s7p.png">
+                <span>Ice Grandpa</span>
+            </a>
+
+            <a href="ice-griffon.html" class="character">
+                <img class="idle" src="s8.png">
+                <img class="hover" src="s8p.png">
+                <span>Ice Grivor<span>
+            </a>
+
+            <a href="ice-ultimate.html" class="character">
+                <img class="idle" src="s9.png">
+                <img class="hover" src="s9p.png">
+                <span>Ice Grivor</span>
+            </a>
+
+            <a href="old-sparta.html" class="character">
+                <img class="idle" src="s11.png">
+                <img class="hover" src="s11p.png">
+                <span>Sparta</span>
+            </a>
+
+            <a href="voltaic-spearton.html" class="character">
+                <img class="idle" src="s12.png">
+                <img class="hover" src="s12p.png">
+                <span>Thunder Spartok</span>
+            </a>
+
+            <a href="vamp-griffon.html" class="character">
+                <img class="idle" src="s13.png">
+                <img class="hover" src="s13p.png">
+                <span>Nightfang Grivor</span>
+            </a>
+
+            <a href="marrowkai.html" class="character">
+                <img class="idle" src="s14.png">
+                <img class="hover" src="s14p.png">
+                <span>Marrowbane</span>
+            </a>
+
+            <a href="castel-archer.html" class="character">
+                <img class="idle" src="s15.png">
+                <img class="hover" src="s15p.png">
+                <span>Fort Arrower</span>
+            </a>
+
+            <a href="Eren.html" class="character">
+                <img class="idle" src="s16.png">
+                <img class="hover" src="s16p.png">
+                <span>Aeron Vale</span>
+            </a>
+
+            <a href="general-xenophone.html" class="character">
+                <img class="idle" src="s17.png">
+                <img class="hover" src="s17p.png">
+                <span>Gladiator</span>
+            </a>
+            <a href="lance-master.html" class="character">
+                <img class="idle" src="s18.png">
+                <img class="hover" src="s18p.png">
+                <span>Lance Master</span>
+                <span class="supporter-badge">❤️ Supporter</span>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- 📌 AUTO SCROLL TO RED SECTION -->
+    <script>
+        window.onload = function () {
+            document.getElementById("stickarc")
+                .scrollIntoView({ behavior: "instant" });
+        };
+    </script>
+
+    <!-- 🔍 SEARCH LOGIC -->
+    <script>
+        function filterCharacters() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const characters = document.querySelectorAll(".character");
+
+            characters.forEach(char => {
+                const name = char.querySelector("span").textContent.toLowerCase();
+                char.style.display = name.includes(filter) ? "block" : "none";
+            });
+        }
+    </script>
+   <!-- 🔐 FIREBASE AUTH -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAIgpVbHc_xdeTb02V_KE13MvxTmWKOSLM",
+            authDomain: "stickarc-dcbc9.firebaseapp.com",
+            projectId: "stickarc-dcbc9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const inboxBtn = document.getElementById("inboxBtn");
+        const searchUserBtn = document.getElementById("searchUserBtn");
+        const requestBox = document.getElementById("requestBox");
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                inboxBtn.href = "login.html";
+                searchUserBtn.href = "login.html";
+                requestBox.querySelector("a").href = "login.html";
+            }
+        });
+    </script>
+
+    <!-- 🦶 FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p>Special thanks to our ❤️ Supporters</p>
+
+            <div class="footer-brand">
+                <h3>Stick Arc</h3>
+                <p>
+                    Free characters & animations for students, animators,
+                    and creative developers.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="about.html">About Us</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms & Conditions</a>
+            </div>
+
+            <div class="footer-links">
+    <h4>Legal</h4>
+    <a href="about.html">About Us</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms & Conditions</a>
+    <a href="comment-policy.html">Comment Policy</a>
+</div>
+
+
+        </div>
+
+        <div class="footer-bottom">
+            © <span id="year"></span> Stick Arc. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent =
+            new Date().getFullYear();
+    </script>
+<script>
+const footer = document.querySelector('.site-footer');
+
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            footer.classList.add('show');
+        }
+    });
+});
+
+observer.observe(footer);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login – Stick Arc</title>
+<link rel="icon" type="image/png" href="favicon.ico.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+body{
+    min-height:100vh;
+    background:linear-gradient(to bottom,#ff8c00,#ffe600);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.login-card{
+    width:100%;
+    max-width:380px;
+    background:rgba(255,255,255,0.95);
+    padding:30px 28px;
+    border-radius:14px;
+    box-shadow:0 20px 40px rgba(0,0,0,0.25);
+    text-align:center;
+    animation:fadeUp 0.6s ease;
+}
+@keyframes fadeUp{
+    from{opacity:0;transform:translateY(25px);}
+    to{opacity:1;transform:translateY(0);}
+}
+.login-card h1{
+    font-size:26px;
+    color:#ff4800;
+    margin-bottom:6px;
+}
+.login-card p{
+    font-size:14px;
+    color:#555;
+    margin-bottom:22px;
+}
+.login-card input{
+    width:100%;
+    padding:14px 16px;
+    margin-bottom:14px;
+    font-size:15px;
+    border-radius:10px;
+    border:2px solid rgba(0,0,0,0.15);
+    outline:none;
+}
+.login-card input:focus{
+    border-color:#ff4800;
+    box-shadow:0 0 0 3px rgba(255,72,0,0.2);
+}
+.login-btn,.signup-btn,.google-btn{
+    width:100%;
+    padding:13px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    border:none;
+    transition:0.3s;
+}
+.login-btn{
+    background:linear-gradient(135deg,#ff4800,#ff9500);
+    color:white;
+    margin-bottom:10px;
+}
+.signup-btn{
+    background:transparent;
+    border:2px solid #ff4800;
+    color:#ff4800;
+    margin-bottom:14px;
+}
+.google-btn{
+    background:white;
+    border:2px solid #ddd;
+    color:#444;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+.google-btn img{
+    width:18px;
+}
+.login-footer{
+    margin-top:18px;
+    font-size:13px;
+    color:#666;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+    <h1>Stick Arc</h1>
+    <p>Login or create your supporter profile</p>
+
+    <input type="email" id="email" placeholder="Email address">
+    <input type="password" id="password" placeholder="Password">
+
+    <button class="login-btn" onclick="login()">Login</button>
+    <button class="signup-btn" onclick="signup()">Create Account</button>
+
+    <button class="google-btn" onclick="googleLogin()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+        Continue with Google
+    </button>
+
+    <div class="login-footer">
+        Your identity stays private & secure 🔒
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup
+} from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIgpVbHc_xdeTb02V_KE13MvxTmWKOSLM",
+  authDomain: "stickarc-dcbc9.firebaseapp.com",
+  projectId: "stickarc-dcbc9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+/* 🔁 AFTER LOGIN / SIGNUP */
+async function redirectAfterLogin(user){
+  const q = query(
+    collection(db,"users"),
+    where("uid","==",user.uid)
+  );
+  const snap = await getDocs(q);
+
+  if(snap.empty){
+    location.href = "username.html";
+  }else{
+    const username = snap.docs[0].id;
+    location.href = "own-profile.html?u=" + username;
+  }
+}
+
+/* ✉ EMAIL SIGNUP */
+window.signup = async ()=>{
+  try{
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value
+    );
+    redirectAfterLogin(cred.user);
+  }catch(err){
+    alert(err.message);
+  }
+};
+
+/* 🔑 EMAIL LOGIN */
+window.login = async ()=>{
+  try{
+    const cred = await signInWithEmailAndPassword(
+      auth,
+      email.value,
+      password.value
+    );
+    redirectAfterLogin(cred.user);
+  }catch(err){
+    alert(err.message);
+  }
+};
+
+/* 🔵 GOOGLE LOGIN */
+window.googleLogin = async ()=>{
+  try{
+    const result = await signInWithPopup(auth, provider);
+    redirectAfterLogin(result.user);
+  }catch(err){
+    alert(err.message);
+  }
+};
+
+/* 🔒 AUTO LOGIN */
+let redirected=false;
+onAuthStateChanged(auth,(user)=>{
+  if(user && !redirected){
+    redirected=true;
+    redirectAfterLogin(user);
+  }
+});
+</script>
+
+</body>
+</html>

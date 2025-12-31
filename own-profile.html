@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Profile | Stick Arc</title>
+<link rel="icon" href="favicon.ico.png">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+}
+.profile{
+  max-width:420px;
+  margin:50px auto;
+  background:#222;
+  padding:25px;
+  border-radius:16px;
+  text-align:center;
+}
+.profile img{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#000;
+}
+.username{
+  font-size:22px;
+  margin-top:10px;
+}
+.bio{
+  opacity:.8;
+  margin-top:6px;
+}
+button{
+  margin-top:15px;
+  padding:12px 20px;
+  border:none;
+  border-radius:20px;
+  background:#ff4800;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="profile">
+  <img id="pic" src="default-avatar.png">
+  <div class="username" id="name">Loading...</div>
+  <div class="bio" id="bio"></div>
+  <button id="actionBtn" style="display:none"></button>
+</div>
+
+<script type="module">
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc }
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged }
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyAIgpVbHc_xdeTb02V_KE13MvxTmWKOSLM",
+  authDomain:"stickarc-dcbc9.firebaseapp.com",
+  projectId:"stickarc-dcbc9"
+});
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+/* DOM */
+const pic = document.getElementById("pic");
+const name = document.getElementById("name");
+const bio = document.getElementById("bio");
+const btn = document.getElementById("actionBtn");
+
+/* USERNAME FROM URL */
+const params = new URLSearchParams(location.search);
+const username = params.get("u");
+
+if(!username){
+  location.href="index.html";
+}
+
+/* AUTH */
+onAuthStateChanged(auth, async(user)=>{
+  const snap = await getDoc(doc(db,"users",username));
+  if(!snap.exists()){
+    alert("User not found");
+    return;
+  }
+
+  const d = snap.data();
+
+  name.textContent = d.username;
+  bio.textContent = d.bio || "No bio added";
+  pic.src = d.photoURL || "default-avatar.png";
+
+  if(user && d.uid === user.uid){
+    btn.style.display="inline-block";
+    btn.textContent="Edit Profile";
+    btn.onclick=()=>location.href=`edit-profile.html?u=${d.username}`;
+  }
+  else if(user){
+    btn.style.display="inline-block";
+    btn.textContent="Message";
+    btn.onclick=()=>location.href=`message.html?to=${d.username}`;
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chat | Stick Arc</title>
+<link rel="icon" href="favicon.ico.png">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  background:#222;
+}
+.header img{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+}
+.status-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:gray;
+}
+.messages{
+  flex:1;
+  padding:12px;
+  overflow-y:auto;
+}
+.msg{
+  max-width:70%;
+  padding:10px 14px;
+  margin-bottom:8px;
+  border-radius:14px;
+}
+.me{
+  background:#ff4800;
+  margin-left:auto;
+}
+.other{
+  background:#333;
+}
+.input-box{
+  display:flex;
+  gap:8px;
+  padding:10px;
+  background:#222;
+}
+input{
+  flex:1;
+  padding:12px;
+  border-radius:20px;
+  border:none;
+}
+button{
+  padding:12px 18px;
+  border:none;
+  border-radius:20px;
+  background:#ff4800;
+  color:white;
+}
+.tick{
+  font-size:12px;
+  opacity:0.8;
+  margin-left:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <img id="userPic" src="default-avatar.png">
+  <span id="userName">Loading...</span>
+  <span id="statusDot" class="status-dot"></span>
+</div>
+
+<div class="messages" id="messages"></div>
+
+<div class="input-box">
+  <input id="text" placeholder="Type a message...">
+  <button onclick="send()">Send</button>
+</div>
+
+<audio id="notifySound">
+  <source src="notification.mp3" type="audio/mpeg">
+</audio>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, query,
+  orderBy, onSnapshot, serverTimestamp,
+  updateDoc, where, getDocs, doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyAIgpVbHc_xdeTb02V_KE13MvxTmWKOSLM",
+  authDomain:"stickarc-dcbc9.firebaseapp.com",
+  projectId:"stickarc-dcbc9"
+});
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const params = new URLSearchParams(location.search);
+const otherUsername = params.get("to");
+
+const messagesBox = document.getElementById("messages");
+const userName = document.getElementById("userName");
+const statusDot = document.getElementById("statusDot");
+const textInput = document.getElementById("text");
+const sound = document.getElementById("notifySound");
+
+let myUID, otherUID, chatId;
+let firstLoad = true;
+
+/* 🔐 AUTH */
+onAuthStateChanged(auth, async(user)=>{
+  if(!user){
+    location.href="login.html";
+    return;
+  }
+
+  myUID = user.uid;
+
+  // 🟢 SET MYSELF ONLINE
+  updateDoc(doc(db,"users",myUID),{ online:true });
+
+  window.addEventListener("beforeunload",()=>{
+    updateDoc(doc(db,"users",myUID),{
+      online:false,
+      lastSeen: serverTimestamp()
+    });
+  });
+
+  // 🔍 fetch other user by username
+  const snap = await getDocs(
+    query(collection(db,"users"), where("username","==",otherUsername))
+  );
+
+  if(snap.empty){
+    alert("User not found");
+    return;
+  }
+
+  const otherUser = snap.docs[0].data();
+  otherUID = otherUser.uid;
+  userName.textContent = otherUser.username;
+
+  chatId = [myUID, otherUID].sort().join("_");
+
+  // 🟢 ONLINE / LAST SEEN LISTENER
+  onSnapshot(doc(db,"users",otherUID),(s)=>{
+    if(!s.exists()) return;
+    const d = s.data();
+
+    if(d.online){
+      statusDot.style.background = "limegreen";
+      userName.textContent = otherUser.username;
+    }else{
+      statusDot.style.background = "gray";
+      if(d.lastSeen){
+        const t = d.lastSeen.toDate().toLocaleTimeString([],{
+          hour:"2-digit", minute:"2-digit"
+        });
+        userName.textContent =
+          otherUser.username + " • last seen " + t;
+      }
+    }
+  });
+
+  listenMessages();
+  markSeen();
+});
+
+/* 🔁 LISTEN + 🔔 SOUND */
+function listenMessages(){
+  const q = query(
+    collection(db,"chats",chatId,"messages"),
+    orderBy("createdAt")
+  );
+
+  onSnapshot(q,(snap)=>{
+    messagesBox.innerHTML="";
+
+    if(!firstLoad){
+      snap.docChanges().forEach(c=>{
+        if(
+          c.type==="added" &&
+          c.doc.data().senderId===otherUID
+        ){
+          sound.play();
+        }
+      });
+    }
+    firstLoad=false;
+
+    snap.forEach(d=>{
+      const m = d.data();
+      const div = document.createElement("div");
+      div.className = "msg " + (m.senderId===myUID?"me":"other");
+
+      let tick="";
+      if(m.senderId===myUID){
+        if(m.seen) tick="✔✔";
+        else if(m.delivered) tick="✔";
+      }
+
+      div.innerHTML = `${m.text}<span class="tick">${tick}</span>`;
+      messagesBox.appendChild(div);
+    });
+
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  });
+}
+
+/* ✔✔ SEEN + UNREAD CLEAR */
+async function markSeen(){
+  const q = query(
+    collection(db,"chats",chatId,"messages"),
+    where("receiverId","==",myUID),
+    where("seen","==",false)
+  );
+
+  const snap = await getDocs(q);
+  snap.forEach(d=>{
+    updateDoc(d.ref,{ seen:true, delivered:true });
+  });
+}
+
+/* ✉ SEND */
+window.send = async ()=>{
+  const text = textInput.value.trim();
+  if(!text) return;
+
+  await addDoc(collection(db,"chats",chatId,"messages"),{
+    senderId: myUID,
+    receiverId: otherUID,
+    text,
+    createdAt: serverTimestamp(),
+    delivered:false,
+    seen:false
+  });
+
+  await addDoc(collection(db,"messages"),{
+    senderId: myUID,
+    receiverId: otherUID,
+    text,
+    timestamp: serverTimestamp(),
+    unread:true,
+    delivered:false,
+    seen:false
+  });
+
+  textInput.value="";
+};
+</script>
+</body>
+</html>
