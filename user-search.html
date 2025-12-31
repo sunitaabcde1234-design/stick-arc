@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Search User | Stick Arc</title>
+<link rel="icon" href="favicon.ico.png">
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+}
+.box{
+  max-width:400px;
+  margin:80px auto;
+  background:#222;
+  padding:25px;
+  border-radius:12px;
+}
+input,button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  margin-top:12px;
+}
+button{
+  background:#ff4800;
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>🔍 Search User</h2>
+  <input id="username" placeholder="Enter username">
+  <button onclick="search()">Search</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyAIgpVbHc_xdeTb02V_KE13MvxTmWKOSLM",
+  authDomain:"stickarc-dcbc9.firebaseapp.com",
+  projectId:"stickarc-dcbc9"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,(user)=>{
+  if(!user) location.href="login.html";
+});
+
+window.search = async ()=>{
+  const uname = username.value.trim();
+  if(!uname) return;
+
+  const snap = await getDoc(doc(db,"users",uname));
+  if(!snap.exists()){
+    alert("User not found");
+    return;
+  }
+
+  location.href = `profile.html?u=${uname}`;
+};
+</script>
+
+</body>
+</html>
