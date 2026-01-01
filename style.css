@@ -36,15 +36,15 @@ body {
     top: 10px;
     right: 10px;
     display: flex;
-    gap: 40px;
+    gap: 20px;
     flex-wrap: wrap;
     z-index: 5;
 }
 
 .btn {
     position: relative;
-    width: 85px;
-    height: 85px;
+    width: 75px;
+    height: 75px;
     cursor: pointer;
 }
 
@@ -581,3 +581,4 @@ body {
     text-align: center;
     pointer-events: none;
 }
+
