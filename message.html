@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat | Stick Arc</title>
 <link rel="icon" href="favicon.ico.png">
 
@@ -15,6 +16,8 @@ body{
   flex-direction:column;
   height:100vh;
 }
+
+/* HEADER */
 .header{
   display:flex;
   align-items:center;
@@ -33,16 +36,20 @@ body{
   border-radius:50%;
   background:gray;
 }
+
+/* MESSAGES */
 .messages{
   flex:1;
   padding:12px;
   overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
 }
 .msg{
   max-width:70%;
   padding:10px 14px;
   margin-bottom:8px;
   border-radius:14px;
+  word-wrap:break-word;
 }
 .me{
   background:#ff4800;
@@ -51,17 +58,28 @@ body{
 .other{
   background:#333;
 }
+.tick{
+  font-size:12px;
+  opacity:0.8;
+  margin-left:6px;
+}
+
+/* INPUT */
 .input-box{
   display:flex;
   gap:8px;
   padding:10px;
   background:#222;
 }
-input{
+textarea{
   flex:1;
   padding:12px;
   border-radius:20px;
   border:none;
+  resize:none;
+  max-height:120px;
+  overflow-y:auto;
+  font-size:15px;
 }
 button{
   padding:12px 18px;
@@ -70,10 +88,29 @@ button{
   background:#ff4800;
   color:white;
 }
-.tick{
-  font-size:12px;
-  opacity:0.8;
-  margin-left:6px;
+
+/* 📱 MOBILE */
+@media (max-width:600px){
+  .header{
+    padding:10px;
+  }
+  .header img{
+    width:36px;
+    height:36px;
+  }
+  .msg{
+    max-width:85%;
+    font-size:14px;
+    padding:8px 12px;
+  }
+  .input-box{
+    padding:8px;
+    gap:6px;
+  }
+  button{
+    padding:10px 14px;
+    font-size:14px;
+  }
 }
 </style>
 </head>
@@ -89,7 +126,7 @@ button{
 <div class="messages" id="messages"></div>
 
 <div class="input-box">
-  <input id="text" placeholder="Type a message...">
+  <textarea id="text" rows="1" placeholder="Type a message..."></textarea>
   <button onclick="send()">Send</button>
 </div>
 
@@ -127,6 +164,12 @@ const sound = document.getElementById("notifySound");
 let myUID, otherUID, chatId;
 let firstLoad = true;
 
+/* ✨ TEXTAREA AUTO RESIZE */
+textInput.addEventListener("input", ()=>{
+  textInput.style.height = "auto";
+  textInput.style.height = textInput.scrollHeight + "px";
+});
+
 /* 🔐 AUTH */
 onAuthStateChanged(auth, async(user)=>{
   if(!user){
@@ -136,7 +179,6 @@ onAuthStateChanged(auth, async(user)=>{
 
   myUID = user.uid;
 
-  // 🟢 SET MYSELF ONLINE
   updateDoc(doc(db,"users",myUID),{ online:true });
 
   window.addEventListener("beforeunload",()=>{
@@ -146,7 +188,6 @@ onAuthStateChanged(auth, async(user)=>{
     });
   });
 
-  // 🔍 fetch other user by username
   const snap = await getDocs(
     query(collection(db,"users"), where("username","==",otherUsername))
   );
@@ -162,22 +203,20 @@ onAuthStateChanged(auth, async(user)=>{
 
   chatId = [myUID, otherUID].sort().join("_");
 
-  // 🟢 ONLINE / LAST SEEN LISTENER
   onSnapshot(doc(db,"users",otherUID),(s)=>{
     if(!s.exists()) return;
     const d = s.data();
 
     if(d.online){
-      statusDot.style.background = "limegreen";
-      userName.textContent = otherUser.username;
+      statusDot.style.background="limegreen";
+      userName.textContent=otherUser.username;
     }else{
-      statusDot.style.background = "gray";
+      statusDot.style.background="gray";
       if(d.lastSeen){
-        const t = d.lastSeen.toDate().toLocaleTimeString([],{
-          hour:"2-digit", minute:"2-digit"
+        const t=d.lastSeen.toDate().toLocaleTimeString([],{
+          hour:"2-digit",minute:"2-digit"
         });
-        userName.textContent =
-          otherUser.username + " • last seen " + t;
+        userName.textContent=otherUser.username+" • last seen "+t;
       }
     }
   });
@@ -186,9 +225,9 @@ onAuthStateChanged(auth, async(user)=>{
   markSeen();
 });
 
-/* 🔁 LISTEN + 🔔 SOUND */
+/* 🔁 LISTEN */
 function listenMessages(){
-  const q = query(
+  const q=query(
     collection(db,"chats",chatId,"messages"),
     orderBy("createdAt")
   );
@@ -198,10 +237,7 @@ function listenMessages(){
 
     if(!firstLoad){
       snap.docChanges().forEach(c=>{
-        if(
-          c.type==="added" &&
-          c.doc.data().senderId===otherUID
-        ){
+        if(c.type==="added" && c.doc.data().senderId===otherUID){
           sound.play();
         }
       });
@@ -209,9 +245,9 @@ function listenMessages(){
     firstLoad=false;
 
     snap.forEach(d=>{
-      const m = d.data();
-      const div = document.createElement("div");
-      div.className = "msg " + (m.senderId===myUID?"me":"other");
+      const m=d.data();
+      const div=document.createElement("div");
+      div.className="msg "+(m.senderId===myUID?"me":"other");
 
       let tick="";
       if(m.senderId===myUID){
@@ -219,53 +255,53 @@ function listenMessages(){
         else if(m.delivered) tick="✔";
       }
 
-      div.innerHTML = `${m.text}<span class="tick">${tick}</span>`;
+      div.innerHTML=`${m.text}<span class="tick">${tick}</span>`;
       messagesBox.appendChild(div);
     });
 
-    messagesBox.scrollTop = messagesBox.scrollHeight;
+    messagesBox.scrollTop=messagesBox.scrollHeight;
   });
 }
 
-/* ✔✔ SEEN + UNREAD CLEAR */
+/* ✔✔ SEEN */
 async function markSeen(){
-  const q = query(
+  const q=query(
     collection(db,"chats",chatId,"messages"),
     where("receiverId","==",myUID),
     where("seen","==",false)
   );
-
-  const snap = await getDocs(q);
+  const snap=await getDocs(q);
   snap.forEach(d=>{
     updateDoc(d.ref,{ seen:true, delivered:true });
   });
 }
 
 /* ✉ SEND */
-window.send = async ()=>{
-  const text = textInput.value.trim();
+window.send=async ()=>{
+  const text=textInput.value.trim();
   if(!text) return;
 
   await addDoc(collection(db,"chats",chatId,"messages"),{
-    senderId: myUID,
-    receiverId: otherUID,
+    senderId:myUID,
+    receiverId:otherUID,
     text,
-    createdAt: serverTimestamp(),
+    createdAt:serverTimestamp(),
     delivered:false,
     seen:false
   });
 
   await addDoc(collection(db,"messages"),{
-    senderId: myUID,
-    receiverId: otherUID,
+    senderId:myUID,
+    receiverId:otherUID,
     text,
-    timestamp: serverTimestamp(),
+    timestamp:serverTimestamp(),
     unread:true,
     delivered:false,
     seen:false
   });
 
   textInput.value="";
+  textInput.style.height="auto";
 };
 </script>
 </body>
