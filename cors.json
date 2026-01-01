@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://sunitaabcde1234-design.github.io"],
+    "method": ["GET", "POST", "PUT"],
+    "maxAgeSeconds": 3600
+  }
+]
